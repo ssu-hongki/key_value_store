@@ -1,5 +1,5 @@
 SRCS = main.c
-LIBSRCS = open.c close.c put.c get.c 
+LIBSRCS = open.c close.c put.c get.c random_level.c
 TARG = kvs_static
 TARG_DYNAMIC = kvs_dynamic
 
@@ -10,9 +10,9 @@ LIBS = -L. -lkvs
 OBJS = $(SRCS:.c=.o)
 LOBJS = $(LIBSRCS:.c=.o)
 LARS = libkvs.a
+LDLIBS = libkvs.so
 
-
-all: 
+all: static dynamic
 
 static: $(TARG)
 
@@ -26,9 +26,13 @@ $(LARS) : $(LOBJS)
 	$(CC) $(OPTS) -c $< -o $@
 
 dynamic: $(TARG_DYNAMIC)
-	$(CC) -o $(TARG) $(OBJS) $(LIBS) 
+
+$(TARG_DYNAMIC): $(OBJS) $(LDLIBS)
+	$(CC) -o $(TARG_DYNAMIC) $(OBJS) $(LIBS)
+$(LDLIBS): $(LOBJS)
+	$(CC) -shared -o $(LDLIBS) $(LOBJS)
 
 clean:
-	rm -f $(OBJS) $(LOBJS) $(LARS) $(TARG)
+	rm -f $(OBJS) $(LOBJS) $(LARS) $(TARG) $(TARG_DYNAMIC) $(LBLIBS)
 
 
